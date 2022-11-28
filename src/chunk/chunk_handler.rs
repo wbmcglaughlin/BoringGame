@@ -41,7 +41,6 @@ fn update_chunks(
                         &mut commands, &asset_server, &mut meshes, &mut materials
                     );
                     chunk_handler.chunk_coordinates.push(coord);
-                    println!("{coord:?}");
                 }
             }
         }
