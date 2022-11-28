@@ -5,6 +5,6 @@ use bevy::{
 #[derive(Component)]
 pub struct Player {
     pub pos: Vec2,
-    vel: Vec2,
-    acc: Vec2
+    pub(crate) vel: Vec2,
+    pub(crate) acc: Vec2
 }

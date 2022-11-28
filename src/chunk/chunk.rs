@@ -15,6 +15,7 @@ pub const STONE: usize = 2;
 pub const CHUNK_SIZE: usize = 16;
 
 pub const TILE_SIZE: f32 = 1.0;
+pub const CHUNK_SIDE_SIZE: f32 = TILE_SIZE * CHUNK_SIZE as f32;
 
 #[derive(Component)]
 pub struct Chunk {

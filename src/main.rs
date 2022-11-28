@@ -7,6 +7,8 @@ use bevy::{
 };
 use bevy::window::PresentMode;
 use crate::chunk::chunk::Chunk;
+use crate::chunk::chunk_handler::ChunkHandlerPlugin;
+use crate::player::player::Player;
 
 fn main() {
     App::new()
@@ -20,19 +22,17 @@ fn main() {
         }))
         .insert_resource(Msaa { samples: 1 })
         .add_startup_system(setup)
+        .add_plugin(ChunkHandlerPlugin)
         .run();
 }
 
 fn setup(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands.spawn(Camera2dBundle::default());
-
-    let mut chunk_1 = Chunk::new(Vec2::default(), 0);
-    chunk_1.spawn(
-        &mut commands, &asset_server, &mut meshes, &mut materials
-    );
+    commands.spawn(Player {
+        pos: Vec2::default(),
+        vel: Vec2::default(),
+        acc: Vec2::default()
+    });
 }
