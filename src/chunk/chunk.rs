@@ -114,7 +114,7 @@ impl ChunkTileMapBuilder {
 
         self.vertices.extend_from_slice(&vertices);
 
-        let mut tri_arr: [u32; 6] = [1, 0, 2, 3, 1, 2];
+        let mut tri_arr: [u32; 6] = [1, 0, 2, 1, 2, 3];
         self.triangles.extend_from_slice({
             for i in &mut tri_arr {
                 *i+=4*self.face_count;
@@ -130,11 +130,12 @@ impl ChunkTileMapBuilder {
         let col = (tile_type as f32 % TEXTURE_DIMENSION).floor();
         let side_size = 1.0 / TEXTURE_DIMENSION;
 
+        // bl, tl, br, tr
         let uvs = [
+            [col * side_size + side_size, row * side_size + side_size],
             [col * side_size, row * side_size],
             [col * side_size, row * side_size + side_size],
             [col * side_size + side_size, row * side_size],
-            [col * side_size + side_size, row * side_size + side_size]
         ];
 
         self.uvs.extend_from_slice(&uvs);
