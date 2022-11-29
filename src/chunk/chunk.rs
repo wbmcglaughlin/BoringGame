@@ -39,6 +39,9 @@ impl Chunk {
                 if coordinate.y * CHUNK_SIDE_SIZE + y as f32 * TILE_SIZE < GROUND_LEVEL {
                     blocks[x][y] = STONE;
                 }
+                if coordinate.y * CHUNK_SIDE_SIZE + y as f32 * TILE_SIZE == GROUND_LEVEL {
+                    blocks[x][y] = GRASS;
+                }
             }
         }
 

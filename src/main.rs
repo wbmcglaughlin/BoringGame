@@ -12,7 +12,7 @@ use crate::player::player::{Player, PlayerPlugin};
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 4 })
+        .insert_resource(Msaa { samples: 1 })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 title: "Boring Game".to_string(),
@@ -20,7 +20,7 @@ fn main() {
                 ..default()
             },
             ..default()
-        }))
+        }).set(ImagePlugin::default_nearest()))
         .add_startup_system(setup)
         .add_plugin(ChunkHandlerPlugin)
         .add_plugin(PlayerPlugin)
