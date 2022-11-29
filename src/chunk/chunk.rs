@@ -55,7 +55,6 @@ impl Chunk {
         for x in 0..CHUNK_SIZE {
             for y in 0..CHUNK_SIZE {
                 self.chunk_tile_map_builder.add_tile(
-                    self.coordinate,
                     Vec2::new(x as f32 * TILE_SIZE, y as f32 * TILE_SIZE),
                     self.blocks[x][y]);
             }
@@ -67,8 +66,8 @@ impl Chunk {
             mesh: meshes.add(mesh).into(),
             material: materials.add(ColorMaterial::from(asset_server.load("tiles/tiles.png"))),
             transform: Transform::from_xyz(
-                self.coordinate.x * TILE_SIZE * CHUNK_SIZE as f32,
-                self.coordinate.y * TILE_SIZE * CHUNK_SIZE as f32,
+                self.coordinate.x * CHUNK_SIDE_SIZE,
+                self.coordinate.y * CHUNK_SIDE_SIZE,
                 0.0),
             ..Default::default()
         }).id();
@@ -99,8 +98,8 @@ impl ChunkTileMapBuilder {
     /// ... #      #      #
     /// ... 0    , 1    , 2
     /// ```
-    pub fn add_tile(&mut self, chunk_coord: Vec2, tile_offset: Vec2, tile_type: usize) {
-        let tile_coord = chunk_coord + tile_offset;
+    pub fn add_tile(&mut self, tile_offset: Vec2, tile_type: usize) {
+        let tile_coord = tile_offset;
         let bl = [tile_coord.x, tile_coord.y, 0.0];
         let tl = [tile_coord.x, tile_coord.y + TILE_SIZE, 0.0];
         let br = [tile_coord.x + TILE_SIZE, tile_coord.y, 0.0];

@@ -1,13 +1,14 @@
 use bevy::{
     prelude::*,
 };
-use crate::player::player_control::player_movement;
+use crate::player::player_control::{player_movement, update_camera};
 
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_player)
-            .add_system(player_movement);
+            .add_system(player_movement)
+            .add_system(update_camera);
     }
 }
 

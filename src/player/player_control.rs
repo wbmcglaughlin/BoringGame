@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
 };
-use crate::Player;
+use crate::{MainCamera, Player};
 
 pub const SPEED: f32 = 0.3;
 pub const SIDE_SPEED_FACTOR: f32 = 1.;
@@ -29,5 +29,17 @@ pub fn player_movement(
         player.add_acc(Vec2::new(side, 0.0));
 
         player.update(time.delta_seconds());
+    }
+}
+
+pub fn update_camera(
+    mut transforms: Query<(&mut Player), With<Player>>,
+    mut camera: Query<(&mut Transform), (With<MainCamera>, Without<Player>)>
+) {
+    for player in transforms.iter() {
+        for mut camera in camera.iter_mut() {
+            camera.translation.x = player.pos.x;
+            camera.translation.y = player.pos.y;
+        }
     }
 }

@@ -12,6 +12,7 @@ use crate::player::player::{Player, PlayerPlugin};
 
 fn main() {
     App::new()
+        .insert_resource(Msaa { samples: 1 })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 title: "Boring Game".to_string(),
@@ -20,15 +21,23 @@ fn main() {
             },
             ..default()
         }))
-        .insert_resource(Msaa { samples: 1 })
         .add_startup_system(setup)
         .add_plugin(ChunkHandlerPlugin)
         .add_plugin(PlayerPlugin)
         .run();
 }
 
+#[derive(Component)]
+pub struct MainCamera;
+
 fn setup(
     mut commands: Commands,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn((Camera2dBundle {
+        projection: OrthographicProjection {
+            scale: 1.0,
+            ..default()
+        },
+            ..default()
+    },MainCamera));
 }
