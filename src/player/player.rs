@@ -33,6 +33,9 @@ impl Player {
     pub fn update(&mut self, dt: f32) {
         self.vel += dt * self.acc;
         self.pos += dt * self.vel;
+
+        self.acc = Vec2::default();
+        self.vel -= self.vel * self.vel.length() * 0.8 * dt;
     }
 
     pub fn add_acc(&mut self, acc: Vec2) {

@@ -12,7 +12,7 @@ use crate::player::player::{Player, PlayerPlugin};
 
 fn main() {
     App::new()
-        .insert_resource(Msaa { samples: 1 })
+        .insert_resource(Msaa { samples: 4 })
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             window: WindowDescriptor {
                 title: "Boring Game".to_string(),

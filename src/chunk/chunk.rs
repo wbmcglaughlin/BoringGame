@@ -17,6 +17,8 @@ pub const CHUNK_SIZE: usize = 16;
 pub const TILE_SIZE: f32 = 1.0;
 pub const CHUNK_SIDE_SIZE: f32 = TILE_SIZE * CHUNK_SIZE as f32;
 
+pub const GROUND_LEVEL: f32 = 0.0;
+
 #[derive(Component)]
 pub struct Chunk {
     pub blocks: [[usize; CHUNK_SIZE]; CHUNK_SIZE],
@@ -34,7 +36,9 @@ impl Chunk {
 
         for x in 0..CHUNK_SIZE {
             for y in 0..CHUNK_SIZE {
-                blocks[x][y] = GRASS;
+                if coordinate.y * CHUNK_SIDE_SIZE + y as f32 * TILE_SIZE < GROUND_LEVEL {
+                    blocks[x][y] = STONE;
+                }
             }
         }
 

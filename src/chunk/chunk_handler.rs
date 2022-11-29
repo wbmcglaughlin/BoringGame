@@ -5,7 +5,7 @@ use crate::Chunk;
 use crate::chunk::chunk::CHUNK_SIDE_SIZE;
 use crate::player::player::Player;
 
-pub const VISIBLE_CHUNKS: i32 = 2;
+pub const VISIBLE_CHUNKS: i32 = 4;
 
 pub struct ChunkHandlerPlugin;
 impl Plugin for ChunkHandlerPlugin {
