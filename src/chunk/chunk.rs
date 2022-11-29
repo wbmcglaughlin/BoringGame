@@ -34,7 +34,7 @@ impl Chunk {
 
         for x in 0..CHUNK_SIZE {
             for y in 0..CHUNK_SIZE {
-                blocks[x][y] = DIRT;
+                blocks[x][y] = GRASS;
             }
         }
 
@@ -99,16 +99,15 @@ impl ChunkTileMapBuilder {
     /// ... 0    , 1    , 2
     /// ```
     pub fn add_tile(&mut self, tile_offset: Vec2, tile_type: usize) {
-        let tile_coord = tile_offset;
-        let bl = [tile_coord.x, tile_coord.y, 0.0];
-        let tl = [tile_coord.x, tile_coord.y + TILE_SIZE, 0.0];
-        let br = [tile_coord.x + TILE_SIZE, tile_coord.y, 0.0];
-        let tr = [tile_coord.x + TILE_SIZE, tile_coord.y + TILE_SIZE, 0.0];
+        let bl = [tile_offset.x, tile_offset.y, 0.0];
+        let tl = [tile_offset.x, tile_offset.y + TILE_SIZE, 0.0];
+        let br = [tile_offset.x + TILE_SIZE, tile_offset.y, 0.0];
+        let tr = [tile_offset.x + TILE_SIZE, tile_offset.y + TILE_SIZE, 0.0];
         let vertices = [bl, tl, br, tr];
 
         self.vertices.extend_from_slice(&vertices);
 
-        let mut tri_arr: [u32; 6] = [0, 2, 1, 3, 1, 2];
+        let mut tri_arr: [u32; 6] = [1, 0, 2, 3, 1, 2];
         self.triangles.extend_from_slice({
             for i in &mut tri_arr {
                 *i+=4*self.face_count;
@@ -125,10 +124,10 @@ impl ChunkTileMapBuilder {
         let side_size = 1.0 / TEXTURE_DIMENSION;
 
         let uvs = [
-            [row * side_size, col * side_size],
-            [row * side_size, col * side_size + side_size],
-            [row * side_size + side_size, col * side_size],
-            [row * side_size + side_size, col * side_size + side_size]
+            [col * side_size, row * side_size],
+            [col * side_size, row * side_size + side_size],
+            [col * side_size + side_size, row * side_size],
+            [col * side_size + side_size, row * side_size + side_size]
         ];
 
         self.uvs.extend_from_slice(&uvs);
