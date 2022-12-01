@@ -27,17 +27,23 @@ fn animate_sprite(
     )>,
 ) {
     for (player, mut timer, mut sprite, texture_atlas_handle) in &mut query {
+        // Check if the player is moving.
         if player.vel.x.abs() > 0. {
+            // Check which direction player is moving in.
             if player.vel.x < 0. {
                 sprite.flip_x = true;
             } else {
                 sprite.flip_x = false;
             }
+
+            // Tick animation timer
             timer.tick(time.delta());
             if timer.just_finished() {
                 let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
                 sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
             }
+        } else {
+            sprite.index = 0;
         }
     }
 }
@@ -56,7 +62,7 @@ pub fn spawn_player(
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     // Set player position
-    let player_position = Vec2::default();
+    let player_position = Vec2::new(0.0, 0.5);
 
     commands.spawn((
         Player {

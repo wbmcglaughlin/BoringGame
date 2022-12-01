@@ -43,7 +43,7 @@ impl Chunk {
                         blocks[x][y] = DIRT;
                     }
                 }
-                if coordinate.y * CHUNK_SIDE_SIZE + y as f32 * TILE_SIZE == GROUND_LEVEL {
+                if coordinate.y * CHUNK_SIDE_SIZE + y as f32 * TILE_SIZE == GROUND_LEVEL - 1.0 {
                     blocks[x][y] = GRASS;
                 }
             }
