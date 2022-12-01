@@ -20,16 +20,24 @@ fn animate_sprite(
     time: Res<Time>,
     texture_atlases: Res<Assets<TextureAtlas>>,
     mut query: Query<(
+        &Player,
         &mut PlayerAnimationTimer,
         &mut TextureAtlasSprite,
         &Handle<TextureAtlas>,
     )>,
 ) {
-    for (mut timer, mut sprite, texture_atlas_handle) in &mut query {
-        timer.tick(time.delta());
-        if timer.just_finished() {
-            let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
-            sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
+    for (player, mut timer, mut sprite, texture_atlas_handle) in &mut query {
+        if player.vel.x.abs() > 0. {
+            if player.vel.x < 0. {
+                sprite.flip_x = true;
+            } else {
+                sprite.flip_x = false;
+            }
+            timer.tick(time.delta());
+            if timer.just_finished() {
+                let texture_atlas = texture_atlases.get(texture_atlas_handle).unwrap();
+                sprite.index = (sprite.index + 1) % texture_atlas.textures.len();
+            }
         }
     }
 }
@@ -58,7 +66,9 @@ pub fn spawn_player(
         },
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
-            transform: Transform::from_translation(player_position.extend(1.0)),
+            transform: Transform::from_translation(
+                player_position.extend(1.0))
+                .with_scale(Vec3::splat(1. / 16.)),
             ..default()
         },
         PlayerAnimationTimer(Timer::from_seconds(0.15, TimerMode::Repeating))

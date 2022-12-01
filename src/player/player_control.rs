@@ -8,10 +8,10 @@ pub const SIDE_SPEED_FACTOR: f32 = 1.;
 
 pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
-    mut transforms: Query<(&mut Player), With<Player>>,
+    mut transforms: Query<(&mut Transform, &mut Player), With<Player>>,
     time: Res<Time>
 ) {
-    for mut player in transforms.iter_mut() {
+    for (mut transform, mut player) in transforms.iter_mut() {
         let player_pos = player.pos;
 
         let mut forward = 0f32;
@@ -29,6 +29,8 @@ pub fn player_movement(
         player.add_acc(Vec2::new(side, 0.0));
 
         player.update(time.delta_seconds());
+
+        transform.translation = player_pos.extend(1.0);
     }
 }
 
