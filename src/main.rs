@@ -3,7 +3,6 @@ mod player;
 
 use bevy::{
     prelude::*,
-    render::{render_resource::WgpuFeatures},
 };
 use bevy::window::PresentMode;
 use crate::chunk::chunk::Chunk;
@@ -21,6 +20,7 @@ fn main() {
             },
             ..default()
         }).set(ImagePlugin::default_nearest()))
+        .insert_resource(ClearColor(Color::rgb(0.6, 0.8, 1.0)))
         .add_startup_system(setup)
         .add_plugin(ChunkHandlerPlugin)
         .add_plugin(PlayerPlugin)
@@ -32,7 +32,15 @@ pub struct MainCamera;
 
 fn setup(
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
 ) {
+    // commands
+    //     .spawn(SpriteBundle {
+    //         texture: asset_server.load("background/sky.png"),
+    //         transform: Transform::from_xyz(0., 0., 0.).with_scale(Vec3::splat(0.08)),
+    //         ..Default::default()
+    //     });
+
     commands.spawn((Camera2dBundle {
         projection: OrthographicProjection {
             scale: 0.03,

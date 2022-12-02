@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
 };
 use bevy::sprite::MaterialMesh2dBundle;
-use bevy::utils::{HashMap, HashSet};
+use bevy::utils::HashSet;
 use crate::Chunk;
 use crate::chunk::chunk::{CHUNK_SIDE_SIZE, ChunkCoordinate};
 use crate::player::player::{Player};
@@ -68,9 +68,7 @@ fn update_chunks(
                 let coord = player_coordinate + Vec2::new(x as f32, y as f32);
                 if !chunk_handler.chunk_coordinates.contains(&coord) {
                     let mut chunk = Chunk::new(coord, 0);
-                    let mesh = chunk.spawn(
-                        &mut commands, &asset_server, &mut meshes, &mut materials
-                    );
+                    let mesh = chunk.generate_mesh();
 
                     let chunk_ent = commands.spawn((ChunkCoordinate {
                         coordinate: coord

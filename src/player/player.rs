@@ -26,7 +26,8 @@ fn animate_sprite(
         &Handle<TextureAtlas>,
     )>,
 ) {
-    for (player, mut timer, mut sprite, texture_atlas_handle) in &mut query {
+    for (player, mut timer,
+        mut sprite, texture_atlas_handle) in &mut query {
         // Check if the player is moving.
         if player.vel.x.abs() > 0. {
             // Check which direction player is moving in.
