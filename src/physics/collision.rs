@@ -3,6 +3,27 @@ use bevy::{
 };
 use crate::chunk::chunk::{AIR, CHUNK_SIDE_SIZE, CHUNK_SIZE, TILE_SIZE};
 use crate::chunk::chunk_handler::ChunkHandler;
+use crate::physics::hitbox::HitBox;
+
+#[derive(Component)]
+pub struct CollisionDistances {
+    pub distances: [f32; 4]
+}
+
+pub struct CollisionPlugin;
+impl Plugin for CollisionPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_system(check_hitbox_for_collision_with_chunk);
+    }
+}
+
+pub fn check_hitbox_for_collision_with_chunk(
+    mut hitboxes: Query<(&Transform, &mut CollisionDistances, &HitBox)>
+) {
+    for (transform, collision_distances, hitbox) in hitboxes.iter_mut() {
+        let position = transform.translation;
+    }
+}
 
 pub fn chunk_raycast(
     point: Vec2,
