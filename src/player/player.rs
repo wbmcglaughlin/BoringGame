@@ -2,6 +2,7 @@ use bevy::{
     prelude::*,
 };
 use crate::chunk::chunk_handler::update_chunks;
+use crate::player::boring::bore;
 use crate::player::player_control::{player_movement, update_camera, update_distance_to_ground};
 
 #[derive(Component, Deref, DerefMut)]
@@ -13,6 +14,7 @@ impl Plugin for PlayerPlugin {
         app
             .add_startup_system(spawn_player)
             .add_system(update_distance_to_ground.after(update_chunks))
+            .add_system(bore)
             .add_system(player_movement)
             .add_system(update_camera)
             .add_system(animate_sprite);
@@ -74,7 +76,7 @@ pub fn spawn_player(
             vel: Vec2::default(),
             acc: Vec2::default(),
             distance_moved: 0.0,
-            distance_to_ground: 0.0
+            distance_to_ground: 1.0
         },
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,

@@ -3,7 +3,7 @@ use bevy::{
 };
 use bevy_debug_text_overlay::screen_print;
 use crate::{MainCamera, Player};
-use crate::chunk::chunk::{AIR, CHUNK_SIDE_SIZE};
+use crate::chunk::chunk::{AIR};
 use crate::chunk::chunk_handler::ChunkHandler;
 
 pub const SPEED: f32 = 100.0;
@@ -44,7 +44,7 @@ pub fn player_movement(
 }
 
 pub fn update_distance_to_ground(
-    chunk_handler: ResMut<ChunkHandler>,
+    mut chunk_handler: ResMut<ChunkHandler>,
     mut players: Query<&mut Player, With<Player>>
 ) {
     // Iter through each player (this should only happen once).
@@ -53,30 +53,24 @@ pub fn update_distance_to_ground(
         let feet_position = player.pos.y - PLAYER_HALF_HEIGHT;
 
         // Get chunk that players foot is in and retrieve chunk.
-        let feet_chunk = Vec2::new(
-            (player.pos.x / CHUNK_SIDE_SIZE).floor(),
-            (feet_position / CHUNK_SIDE_SIZE).floor()
-        );
-        let chunk = chunk_handler.get_chunk(feet_chunk);
-
-        // Get x and y array positions.
-        let x = (player.pos.x - chunk.coordinate.x * CHUNK_SIDE_SIZE).floor() as usize;
-        let y = (feet_position - chunk.coordinate.y * CHUNK_SIDE_SIZE).floor() as usize;
+        let feet_point = Vec2::new(player.pos.x, feet_position);
+        let (chunk, x, y) = chunk_handler.get_chunk_xy(feet_point);
 
         // Iterate down from current foot position to bottom of chunk.
         for y_iter in (0..y).rev() {
-            // If the block is not an air block or the edge of the chunk is reached, return distance
-            if chunk.blocks[x][y_iter as usize] != AIR || y_iter == 0 {
+            // If the block is not an air block
+            if chunk.blocks[x][y_iter as usize] != AIR {
                 player.distance_to_ground = feet_position - y_iter as f32;
                 break
             }
         }
+        player.distance_to_ground = feet_position - 0 as f32;
     }
 }
 
 pub fn update_camera(
-    mut transforms: Query<(&mut Player), With<Player>>,
-    mut camera: Query<(&mut Transform), (With<MainCamera>, Without<Player>)>
+    transforms: Query<&mut Player, With<Player>>,
+    mut camera: Query<&mut Transform, (With<MainCamera>, Without<Player>)>
 ) {
     for player in transforms.iter() {
         for mut camera in camera.iter_mut() {

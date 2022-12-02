@@ -32,7 +32,6 @@ pub struct ChunkCoordinate {
     pub coordinate: Vec2,
 }
 
-
 impl Chunk {
     pub fn new(
         cord: Vec2,
@@ -63,6 +62,15 @@ impl Chunk {
             coordinate,
             chunk_tile_map_builder: ChunkTileMapBuilder::default()
         }
+    }
+
+    pub fn set_block(
+        &mut self,
+        x: usize,
+        y: usize,
+        block: usize
+    ) {
+        self.blocks[x][y] = block;
     }
 
     pub fn generate_mesh (

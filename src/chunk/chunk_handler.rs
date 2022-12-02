@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
 };
-use bevy::sprite::MaterialMesh2dBundle;
+use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
 use bevy::utils::HashSet;
 use crate::Chunk;
 use crate::chunk::chunk::{CHUNK_SIDE_SIZE, ChunkCoordinate};
@@ -13,7 +13,8 @@ pub struct ChunkHandlerPlugin;
 impl Plugin for ChunkHandlerPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(ChunkHandler {
-            chunks: Vec::new()
+            chunks: Vec::new(),
+            chunks_to_remesh: Vec::new()
         }).add_system(update_chunks)
             .add_system(remove_chunks);
     }
@@ -21,7 +22,8 @@ impl Plugin for ChunkHandlerPlugin {
 
 #[derive(Resource)]
 pub struct ChunkHandler {
-    pub chunks: Vec<Chunk>
+    pub chunks: Vec<Chunk>,
+    pub chunks_to_remesh: Vec<Vec2>
 }
 
 impl ChunkHandler {
@@ -39,16 +41,48 @@ impl ChunkHandler {
     }
 
     pub fn get_chunk(
-        &self,
+        &mut self,
         chunk_coordinate: Vec2
-    ) -> &Chunk {
-        for chunk in &self.chunks {
+    ) -> &mut Chunk {
+        for chunk in self.chunks.iter_mut() {
             if chunk.coordinate == chunk_coordinate {
                 return chunk;
             }
         }
 
         panic!("Chunk does not exist")
+    }
+
+    pub fn get_chunk_xy(
+        &mut self,
+        coordinate: Vec2
+    ) -> (&mut Chunk, usize, usize) {
+        let chunk_coord = (coordinate / CHUNK_SIDE_SIZE).floor();
+        let chunk = self.get_chunk(chunk_coord);
+
+        // Get x and y array positions.
+        let x = (coordinate.x - chunk.coordinate.x * CHUNK_SIDE_SIZE).floor() as usize;
+        let y = (coordinate.y - chunk.coordinate.y * CHUNK_SIDE_SIZE).floor() as usize;
+
+        (chunk, x, y)
+    }
+
+    pub fn update_chunk(
+        &mut self,
+        chunk_coordinate: Vec2,
+        x: usize,
+        y: usize,
+        new_block: usize
+    ) {
+        let chunk = self.get_chunk(chunk_coordinate);
+        chunk.set_block(x, y, new_block);
+    }
+
+    pub fn chunks_to_remesh(
+        &mut self,
+        chunk_coord: Vec2
+    ) {
+        self.chunks_to_remesh.push(chunk_coord);
     }
 }
 
@@ -86,8 +120,35 @@ pub fn update_chunks(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     players: Query<(&Player), With<Player>>,
+    mut chunks: Query<(Entity, &mut ChunkCoordinate), (With<ChunkCoordinate>, Without<Player>)>,
     mut chunk_handler: ResMut<ChunkHandler>
 ) {
+    for coord_to_remesh in chunk_handler.chunks_to_remesh.clone() {
+        for (entity, mut chunk_coord) in chunks.iter_mut() {
+            if chunk_coord.coordinate == coord_to_remesh {
+                let chunk = chunk_handler.get_chunk(coord_to_remesh);
+                let new_mesh = chunk.generate_mesh();
+
+                commands.entity(entity).despawn_recursive();
+                print!("{}", chunk_coord.coordinate);
+
+                commands.spawn((ChunkCoordinate {
+                    coordinate: chunk_coord.coordinate
+                }, MaterialMesh2dBundle  {
+                    mesh: meshes.add(new_mesh).into(),
+                    material: materials.add(ColorMaterial::from(asset_server.load("tiles/tiles.png"))),
+                    transform: Transform::from_xyz(
+                        chunk_coord.coordinate.x * CHUNK_SIDE_SIZE,
+                        chunk_coord.coordinate.y * CHUNK_SIDE_SIZE,
+                        0.0),
+                    ..Default::default()
+                }));
+            }
+        }
+    }
+
+    chunk_handler.chunks_to_remesh.clear();
+
     for player in players.iter() {
         let player_coordinate = Vec2::new((player.pos.x / CHUNK_SIDE_SIZE).floor(), (player.pos.y / CHUNK_SIDE_SIZE).floor());
 
