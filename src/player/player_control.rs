@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
 };
 use crate::{MainCamera, Player};
-use crate::chunk::chunk::ChunkCoordinate;
+use crate::chunk::chunk::{CHUNK_SIDE_SIZE, ChunkCoordinate};
 use crate::chunk::chunk_handler::ChunkHandler;
 
 pub const SPEED: f32 = 100.0;
@@ -46,7 +46,10 @@ pub fn update_distance_to_ground(
     mut chunks: Query<(Entity, &mut ChunkCoordinate), With<ChunkCoordinate>>
 ) {
     for (transform, mut player) in players.iter_mut() {
-        
+        let feet_position = player.pos.y - 0.5;
+        let feet_chunk = Vec2::new((player.pos.x / CHUNK_SIDE_SIZE).floor(), (feet_position / CHUNK_SIDE_SIZE).floor());
+
+        let blocks = chunk_handler.get_chunk(feet_chunk);
     }
 }
 

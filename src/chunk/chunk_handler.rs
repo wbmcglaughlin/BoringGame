@@ -37,6 +37,19 @@ impl ChunkHandler {
 
         false
     }
+
+    pub fn get_chunk(
+        &self,
+        chunk_coordinate: Vec2
+    ) -> &Chunk {
+        for chunk in &self.chunks {
+            if chunk.coordinate == chunk_coordinate {
+                return chunk;
+            }
+        }
+
+        panic!("Chunk does not exist")
+    }
 }
 
 fn remove_chunks(
