@@ -1,6 +1,7 @@
 use bevy::{
     prelude::*,
 };
+use rand::Rng;
 use crate::chunk::meshing::ChunkTileMapBuilder;
 
 pub const TEXTURE_DIMENSION: f32 = 8.0;
@@ -37,6 +38,7 @@ impl Chunk {
         cord: Vec2,
         seed: u32
     ) -> Self {
+        let mut prng = rand::thread_rng();
         let mut blocks = [[AIR; CHUNK_SIZE]; CHUNK_SIZE];
         let coordinate = cord;
 
@@ -44,7 +46,7 @@ impl Chunk {
             for y in 0..CHUNK_SIZE {
                 let level = coordinate.y * CHUNK_SIDE_SIZE + y as f32 * TILE_SIZE;
                 if level < GROUND_LEVEL {
-                    if level < STONE_LEVEL {
+                    if level < STONE_LEVEL + prng.gen::<f32>() * 5.0 {
                         blocks[x][y] = STONE;
                     } else {
                         blocks[x][y] = DIRT;

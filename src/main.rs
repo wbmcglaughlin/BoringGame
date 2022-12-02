@@ -5,6 +5,7 @@ use bevy::{
     prelude::*,
 };
 use bevy::window::PresentMode;
+use bevy_debug_text_overlay::OverlayPlugin;
 use crate::chunk::chunk::Chunk;
 use crate::chunk::chunk_handler::ChunkHandlerPlugin;
 use crate::player::player::{Player, PlayerPlugin};
@@ -21,6 +22,7 @@ fn main() {
             ..default()
         }).set(ImagePlugin::default_nearest()))
         .insert_resource(ClearColor(Color::rgb(0.6, 0.8, 1.0)))
+        .add_plugin(OverlayPlugin { font_size: 22.0, ..default() })
         .add_startup_system(setup)
         .add_plugin(ChunkHandlerPlugin)
         .add_plugin(PlayerPlugin)

@@ -10,7 +10,8 @@ struct PlayerAnimationTimer(Timer);
 pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(spawn_player)
+        app
+            .add_startup_system(spawn_player)
             .add_system(update_distance_to_ground.after(update_chunks))
             .add_system(player_movement)
             .add_system(update_camera)
@@ -109,11 +110,20 @@ impl Player {
 
         self.distance_moved += (dt * self.vel).length();
 
-        self.acc = Vec2::default();
         self.vel -= self.vel * self.vel.length() * 0.9 * dt;
+
+        if self.vel.x.abs() < 2.0 && self.acc.x.abs() == 0. {
+            self.vel.x = 0.0
+        }
+
+        self.acc = Vec2::default();
     }
 
-    pub fn add_acc(&mut self, acc: Vec2) {
+    pub fn add_acc(&mut self, mut acc: Vec2) {
+        let mut accel = acc.clone();
+        if self.distance_to_ground > 0.0 {
+            accel.x = 0.
+        }
         self.acc += acc;
     }
 }

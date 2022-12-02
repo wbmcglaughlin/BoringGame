@@ -1,6 +1,7 @@
 use bevy::{
     prelude::*,
 };
+use bevy_debug_text_overlay::screen_print;
 use crate::{MainCamera, Player};
 use crate::chunk::chunk::{AIR, CHUNK_SIDE_SIZE};
 use crate::chunk::chunk_handler::ChunkHandler;
@@ -8,6 +9,7 @@ use crate::chunk::chunk_handler::ChunkHandler;
 pub const SPEED: f32 = 100.0;
 pub const SIDE_SPEED_FACTOR: f32 = 1.;
 pub const GRAVITY: f32 = 10.;
+pub const PLAYER_HALF_HEIGHT: f32 = 0.5;
 
 pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
@@ -15,6 +17,8 @@ pub fn player_movement(
     time: Res<Time>
 ) {
     for (mut transform, mut player) in transforms.iter_mut() {
+        screen_print!("{}", player.distance_to_ground);
+
         let player_pos = player.pos;
 
         let mut side = 0f32;
@@ -41,24 +45,32 @@ pub fn player_movement(
 
 pub fn update_distance_to_ground(
     chunk_handler: ResMut<ChunkHandler>,
-    mut players: Query<(&Transform, &mut Player), With<Player>>
+    mut players: Query<&mut Player, With<Player>>
 ) {
-    for (transform, mut player) in players.iter_mut() {
-        let feet_position = player.pos.y - 0.5;
-        let feet_chunk = Vec2::new((player.pos.x / CHUNK_SIDE_SIZE).floor(), (feet_position / CHUNK_SIDE_SIZE).floor());
+    // Iter through each player (this should only happen once).
+    for mut player in players.iter_mut() {
+        // Players foot is PLAYER_HALF_HEIGHT units from center.
+        let feet_position = player.pos.y - PLAYER_HALF_HEIGHT;
 
+        // Get chunk that players foot is in and retrieve chunk.
+        let feet_chunk = Vec2::new(
+            (player.pos.x / CHUNK_SIDE_SIZE).floor(),
+            (feet_position / CHUNK_SIDE_SIZE).floor()
+        );
         let chunk = chunk_handler.get_chunk(feet_chunk);
 
+        // Get x and y array positions.
         let x = (player.pos.x - chunk.coordinate.x * CHUNK_SIDE_SIZE).floor() as usize;
         let y = (feet_position - chunk.coordinate.y * CHUNK_SIDE_SIZE).floor() as usize;
 
-        for y_iter in (y as i32)..(-(1 as i32)) {
-            if chunk.blocks[x][y_iter as usize] != AIR {
+        // Iterate down from current foot position to bottom of chunk.
+        for y_iter in (0..y).rev() {
+            // If the block is not an air block or the edge of the chunk is reached, return distance
+            if chunk.blocks[x][y_iter as usize] != AIR || y_iter == 0 {
                 player.distance_to_ground = feet_position - y_iter as f32;
                 break
             }
         }
-        player.distance_to_ground = feet_position - 0. as f32;
     }
 }
 
