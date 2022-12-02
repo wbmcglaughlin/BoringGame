@@ -64,11 +64,12 @@ pub fn spawn_player(
     // Set player position
     let player_position = Vec2::new(0.0, 0.5);
 
-    commands.spawn((
+    let player_entity = commands.spawn((
         Player {
             pos: player_position,
             vel: Vec2::default(),
-            acc: Vec2::default()
+            acc: Vec2::default(),
+            distance_moved: 0.0
         },
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -78,23 +79,28 @@ pub fn spawn_player(
             ..default()
         },
         PlayerAnimationTimer(Timer::from_seconds(0.15, TimerMode::Repeating))
-    ));
+    )).id();
 }
 
 #[derive(Component)]
 pub struct Player {
     pub pos: Vec2,
     pub(crate) vel: Vec2,
-    pub(crate) acc: Vec2
+    pub(crate) acc: Vec2,
+
+    pub distance_moved: f32
 }
 
 impl Player {
     pub fn update(&mut self, dt: f32) {
+        // TODO: fix slowing down
         self.vel += dt * self.acc;
         self.pos += dt * self.vel;
 
+        self.distance_moved += (dt * self.vel).length();
+
         self.acc = Vec2::default();
-        self.vel -= self.vel * self.vel.length() * 0.8 * dt;
+        self.vel -= self.vel * self.vel.length() * 0.9 * dt;
     }
 
     pub fn add_acc(&mut self, acc: Vec2) {

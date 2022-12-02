@@ -87,7 +87,7 @@ impl Chunk {
     }
 }
 
-#[derive(Default, Clone)]
+#[derive(Default)]
 pub struct ChunkTileMapBuilder {
     vertices: Vec<[f32; 3]>,
     triangles: Vec<u32>,
