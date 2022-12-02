@@ -1,5 +1,6 @@
 mod chunk;
 mod player;
+mod physics;
 
 use bevy::{
     prelude::*,

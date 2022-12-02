@@ -5,6 +5,7 @@ use bevy_debug_text_overlay::screen_print;
 use crate::{MainCamera, Player};
 use crate::chunk::chunk::{AIR, CHUNK_SIDE_SIZE, CHUNK_SIZE, TILE_SIZE};
 use crate::chunk::chunk_handler::ChunkHandler;
+use crate::physics::collision::chunk_raycast;
 
 pub const SPEED: f32 = 100.0;
 pub const SIDE_SPEED_FACTOR: f32 = 1.;
@@ -47,30 +48,19 @@ pub fn update_distance_to_ground(
 ) {
     // Iter through each player (this should only happen once).
     for mut player in players.iter_mut() {
-        // Players foot is PLAYER_HALF_HEIGHT units from center.
-        let feet_position = player.pos.y - PLAYER_HALF_HEIGHT;
+        // Get the 4 Raycast Corners
+        let bl = player.pos - PLAYER_HALF_HEIGHT;
+        let br = Vec2::new(player.pos.x + PLAYER_HALF_HEIGHT, player.pos.y - PLAYER_HALF_HEIGHT);
+        let tl = Vec2::new(player.pos.x - PLAYER_HALF_HEIGHT, player.pos.y + PLAYER_HALF_HEIGHT);
+        let tr = player.pos + PLAYER_HALF_HEIGHT;
 
-        // Get chunk that players foot is in and retrieve chunk.
-        let feet_point = Vec2::new(player.pos.x, feet_position);
-        let (chunk, x, y) = chunk_handler.get_chunk_xy(feet_point);
+        // Array to store minimum distances [U, D, L, R]
+        let mut raycast_minimum_distances: [f32; 4] = [CHUNK_SIDE_SIZE; 4];
 
-        let feet_distance_from_chunk_bottom = feet_position - chunk.coordinate.y * CHUNK_SIDE_SIZE;
+        raycast_minimum_distances[1] = raycast_minimum_distances[1].min(chunk_raycast(bl, &mut chunk_handler));
+        raycast_minimum_distances[1] = raycast_minimum_distances[1].min(chunk_raycast(br, &mut chunk_handler));
 
-        // Iterate down from current foot position to bottom of chunk.
-        for chunk_y_coordinate in (0..y + 1).rev() {
-            // If the block is not an air block
-            if chunk.blocks[x][chunk_y_coordinate as usize] != AIR {
-                player.distance_to_ground = feet_distance_from_chunk_bottom - chunk_y_coordinate as f32 - 1.0;
-                return;
-            }
-        }
-        let (chunk, x, _) = chunk_handler.get_chunk_xy(Vec2::new(player.pos.x, feet_position - CHUNK_SIDE_SIZE / 2.0));
-
-        if chunk.blocks[x][CHUNK_SIZE - 1] == AIR {
-            player.distance_to_ground = feet_distance_from_chunk_bottom + TILE_SIZE;
-        } else {
-            player.distance_to_ground = feet_distance_from_chunk_bottom;
-        }
+        player.distance_to_ground = raycast_minimum_distances[1];
     }
 }
 
