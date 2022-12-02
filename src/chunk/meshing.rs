@@ -18,6 +18,16 @@ impl ChunkTileMapBuilder {
         Self::default()
     }
 
+    pub fn clear(
+        &mut self
+    ) {
+        self.vertices.clear();
+        self.triangles.clear();
+        self.normals.clear();
+        self.uvs.clear();
+        self.face_count = 0;
+    }
+
     /// ```
     /// Tiles are numbered from bottom left to top right starting with rows first.
     /// i.e.

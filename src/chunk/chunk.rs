@@ -88,5 +88,11 @@ impl Chunk {
 
         mesh
     }
+
+    pub fn clear_builder(
+        &mut self,
+    ) {
+        self.chunk_tile_map_builder.clear();
+    }
 }
 

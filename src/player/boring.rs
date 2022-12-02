@@ -24,7 +24,7 @@ pub fn bore(
 
             if chunk.blocks[x][y] != AIR {
                 chunk.set_block(x, y, AIR);
-                println!("{}:{}", x, y);
+
                 chunks_to_remesh.push(chunk.coordinate);
             }
         }

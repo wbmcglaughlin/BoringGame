@@ -127,10 +127,10 @@ pub fn update_chunks(
         for (entity, mut chunk_coord) in chunks.iter_mut() {
             if chunk_coord.coordinate == coord_to_remesh {
                 let chunk = chunk_handler.get_chunk(coord_to_remesh);
+                chunk.clear_builder();
                 let new_mesh = chunk.generate_mesh();
 
                 commands.entity(entity).despawn_recursive();
-                print!("{}", chunk_coord.coordinate);
 
                 commands.spawn((ChunkCoordinate {
                     coordinate: chunk_coord.coordinate
