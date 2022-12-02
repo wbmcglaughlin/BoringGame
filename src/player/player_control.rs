@@ -17,8 +17,6 @@ pub fn player_movement(
     time: Res<Time>
 ) {
     for (mut transform, mut player) in transforms.iter_mut() {
-        screen_print!("{}", player.distance_to_ground);
-
         let player_pos = player.pos;
 
         let mut side = 0f32;
@@ -58,7 +56,6 @@ pub fn update_distance_to_ground(
 
         let feet_distance_from_chunk_bottom = feet_position - chunk.coordinate.y * CHUNK_SIDE_SIZE;
 
-        screen_print!("{}, [{}, {}], {}", chunk.coordinate, x, y, feet_point);
         // Iterate down from current foot position to bottom of chunk.
         for chunk_y_coordinate in (0..y + 1).rev() {
             // If the block is not an air block

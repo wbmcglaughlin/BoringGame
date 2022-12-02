@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
 };
-use crate::chunk::chunk::AIR;
+use crate::chunk::chunk::{AIR, TILE_SIZE};
 use crate::chunk::chunk_handler::ChunkHandler;
 use crate::Player;
 use crate::player::player_control::PLAYER_HALF_HEIGHT;
@@ -14,13 +14,13 @@ pub fn bore(
 ) {
     let mut chunks_to_remesh = Vec::new();
 
-    for mut player in transforms.iter_mut() {
-        let mut player_feet_pos = player.pos;
-        player_feet_pos.y -= PLAYER_HALF_HEIGHT;
+    for player in transforms.iter_mut() {
+        let mut player_mine_region = player.pos;
+        player_mine_region.y -= PLAYER_HALF_HEIGHT + TILE_SIZE / 2.0;
 
         if keyboard_input.pressed(KeyCode::M) {
             let (chunk, x, y)
-                = chunk_handler.get_chunk_xy(player_feet_pos);
+                = chunk_handler.get_chunk_xy(player_mine_region);
 
             if chunk.blocks[x][y] != AIR {
                 chunk.set_block(x, y, AIR);

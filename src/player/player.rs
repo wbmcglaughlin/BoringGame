@@ -106,6 +106,7 @@ impl Player {
 
         if self.distance_to_ground <= 0. && self.vel.y < 0.{
             self.vel.y = 0.;
+            self.pos.y = (self.pos.y + 0.5).round() - 0.5;
         }
 
         self.pos += dt * self.vel;
