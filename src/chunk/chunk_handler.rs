@@ -80,7 +80,7 @@ fn remove_chunks(
     }
 }
 
-fn update_chunks(
+pub fn update_chunks(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,

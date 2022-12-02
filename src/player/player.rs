@@ -1,7 +1,8 @@
 use bevy::{
     prelude::*,
 };
-use crate::player::player_control::{player_movement, update_camera};
+use crate::chunk::chunk_handler::update_chunks;
+use crate::player::player_control::{player_movement, update_camera, update_distance_to_ground};
 
 #[derive(Component, Deref, DerefMut)]
 struct PlayerAnimationTimer(Timer);
@@ -10,6 +11,7 @@ pub struct PlayerPlugin;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(spawn_player)
+            .add_system(update_distance_to_ground.after(update_chunks))
             .add_system(player_movement)
             .add_system(update_camera)
             .add_system(animate_sprite);
@@ -98,6 +100,10 @@ impl Player {
     pub fn update(&mut self, dt: f32) {
         // TODO: fix slowing down
         self.vel += dt * self.acc;
+        if self.distance_to_ground < 0. && self.vel.y < 0.{
+            self.vel.y = 0.;
+        }
+
         self.pos += dt * self.vel;
 
         self.distance_moved += (dt * self.vel).length();

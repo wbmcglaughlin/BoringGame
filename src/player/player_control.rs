@@ -2,7 +2,7 @@ use bevy::{
     prelude::*,
 };
 use crate::{MainCamera, Player};
-use crate::chunk::chunk::{CHUNK_SIDE_SIZE, ChunkCoordinate};
+use crate::chunk::chunk::{AIR, CHUNK_SIDE_SIZE};
 use crate::chunk::chunk_handler::ChunkHandler;
 
 pub const SPEED: f32 = 100.0;
@@ -40,16 +40,24 @@ pub fn player_movement(
 }
 
 pub fn update_distance_to_ground(
-    mut commands: Commands,
-    mut chunk_handler: ResMut<ChunkHandler>,
-    mut players: Query<(&Transform, &mut Player), (With<Player>, Without<ChunkCoordinate>)>,
-    mut chunks: Query<(Entity, &mut ChunkCoordinate), With<ChunkCoordinate>>
+    chunk_handler: ResMut<ChunkHandler>,
+    mut players: Query<(&Transform, &mut Player), With<Player>>
 ) {
     for (transform, mut player) in players.iter_mut() {
         let feet_position = player.pos.y - 0.5;
         let feet_chunk = Vec2::new((player.pos.x / CHUNK_SIDE_SIZE).floor(), (feet_position / CHUNK_SIDE_SIZE).floor());
 
-        let blocks = chunk_handler.get_chunk(feet_chunk);
+        let chunk = chunk_handler.get_chunk(feet_chunk);
+
+        let x = (player.pos.x - chunk.coordinate.x * CHUNK_SIDE_SIZE).floor() as usize;
+        let y = (feet_position - chunk.coordinate.y * CHUNK_SIDE_SIZE).floor() as usize;
+
+        for y_iter in (0..y).rev() {
+            if chunk.blocks[x][y_iter] != AIR {
+                player.distance_to_ground = feet_position - y_iter as f32;
+                break
+            }
+        }
     }
 }
 
