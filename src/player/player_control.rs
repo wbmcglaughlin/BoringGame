@@ -2,6 +2,8 @@ use bevy::{
     prelude::*,
 };
 use crate::{MainCamera, Player};
+use crate::chunk::chunk::ChunkCoordinate;
+use crate::chunk::chunk_handler::ChunkHandler;
 
 pub const SPEED: f32 = 100.0;
 pub const SIDE_SPEED_FACTOR: f32 = 1.;
@@ -34,6 +36,17 @@ pub fn player_movement(
         player.update(time.delta_seconds());
 
         transform.translation = player_pos.extend(1.0);
+    }
+}
+
+pub fn update_distance_to_ground(
+    mut commands: Commands,
+    mut chunk_handler: ResMut<ChunkHandler>,
+    mut players: Query<(&Transform, &mut Player), (With<Player>, Without<ChunkCoordinate>)>,
+    mut chunks: Query<(Entity, &mut ChunkCoordinate), With<ChunkCoordinate>>
+) {
+    for (transform, mut player) in players.iter_mut() {
+        
     }
 }
 

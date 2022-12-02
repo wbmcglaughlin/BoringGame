@@ -70,7 +70,8 @@ pub fn spawn_player(
             pos: player_position,
             vel: Vec2::default(),
             acc: Vec2::default(),
-            distance_moved: 0.0
+            distance_moved: 0.0,
+            distance_to_ground: 0.0
         },
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
@@ -89,7 +90,8 @@ pub struct Player {
     pub(crate) vel: Vec2,
     pub(crate) acc: Vec2,
 
-    pub distance_moved: f32
+    pub distance_moved: f32,
+    pub distance_to_ground: f32
 }
 
 impl Player {

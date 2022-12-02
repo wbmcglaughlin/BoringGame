@@ -13,7 +13,7 @@ pub struct ChunkHandlerPlugin;
 impl Plugin for ChunkHandlerPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(ChunkHandler {
-            chunk_coordinates: Vec::new()
+            chunks: Vec::new()
         }).add_system(update_chunks)
             .add_system(remove_chunks);
     }
@@ -21,7 +21,22 @@ impl Plugin for ChunkHandlerPlugin {
 
 #[derive(Resource)]
 pub struct ChunkHandler {
-    pub chunk_coordinates: Vec<Vec2>
+    pub chunks: Vec<Chunk>
+}
+
+impl ChunkHandler {
+    pub fn contains_chunk(
+        &self,
+        chunk_coordinate: Vec2
+    ) -> bool {
+        for chunk in &self.chunks {
+            if chunk.coordinate == chunk_coordinate {
+                return true;
+            }
+        }
+
+        false
+    }
 }
 
 fn remove_chunks(
@@ -40,7 +55,7 @@ fn remove_chunks(
                 let distance = transform.translation.distance_squared(chunk_coordinate.coordinate.extend(0.0) * CHUNK_SIDE_SIZE);
 
                 if distance > CHUNK_SIDE_SIZE * CHUNK_SIDE_SIZE * VISIBLE_CHUNKS as f32 * VISIBLE_CHUNKS as f32 {
-                    chunk_handler.chunk_coordinates.retain(|coord| *coord != chunk_coordinate.coordinate);
+                    chunk_handler.chunks.retain(|chunk| (*chunk).coordinate != chunk_coordinate.coordinate);
                     chunks_to_remove.insert(chunk_entity);
                 }
             }
@@ -66,7 +81,7 @@ fn update_chunks(
         for x in (-VISIBLE_CHUNKS+1)..VISIBLE_CHUNKS {
             for y in (-VISIBLE_CHUNKS+1)..VISIBLE_CHUNKS {
                 let coord = player_coordinate + Vec2::new(x as f32, y as f32);
-                if !chunk_handler.chunk_coordinates.contains(&coord) {
+                if !chunk_handler.contains_chunk(coord) {
                     let mut chunk = Chunk::new(coord, 0);
                     let mesh = chunk.generate_mesh();
 
@@ -82,7 +97,7 @@ fn update_chunks(
                         ..Default::default()
                     })).id();
 
-                    chunk_handler.chunk_coordinates.push(coord);
+                    chunk_handler.chunks.push(chunk);
                 }
             }
         }
