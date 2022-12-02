@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
 };
-use bevy::sprite::{MaterialMesh2dBundle, Mesh2dHandle};
+use bevy::sprite::{MaterialMesh2dBundle};
 use bevy::utils::HashSet;
 use crate::Chunk;
 use crate::chunk::chunk::{CHUNK_SIDE_SIZE, ChunkCoordinate};
@@ -119,12 +119,13 @@ pub fn update_chunks(
     asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    players: Query<(&Player), With<Player>>,
-    mut chunks: Query<(Entity, &mut ChunkCoordinate), (With<ChunkCoordinate>, Without<Player>)>,
+    players: Query<&Player, With<Player>>,
+    chunks: Query<(Entity, &mut ChunkCoordinate), (With<ChunkCoordinate>, Without<Player>)>,
     mut chunk_handler: ResMut<ChunkHandler>
 ) {
+    // Remesh Chunks
     for coord_to_remesh in chunk_handler.chunks_to_remesh.clone() {
-        for (entity, mut chunk_coord) in chunks.iter_mut() {
+        for (entity, chunk_coord) in chunks.iter() {
             if chunk_coord.coordinate == coord_to_remesh {
                 let chunk = chunk_handler.get_chunk(coord_to_remesh);
                 chunk.clear_builder();
@@ -149,6 +150,7 @@ pub fn update_chunks(
 
     chunk_handler.chunks_to_remesh.clear();
 
+    // Generate Chunks
     for player in players.iter() {
         let player_coordinate = Vec2::new((player.pos.x / CHUNK_SIDE_SIZE).floor(), (player.pos.y / CHUNK_SIDE_SIZE).floor());
 

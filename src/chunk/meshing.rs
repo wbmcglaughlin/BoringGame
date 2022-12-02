@@ -74,6 +74,7 @@ impl ChunkTileMapBuilder {
         self.face_count += 1;
     }
 
+
     pub fn build(&mut self) -> Mesh {
         let mut msh= Mesh::new(PrimitiveTopology::TriangleList);
 
