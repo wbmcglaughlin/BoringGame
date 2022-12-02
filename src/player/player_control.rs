@@ -7,7 +7,7 @@ use crate::chunk::chunk_handler::ChunkHandler;
 
 pub const SPEED: f32 = 100.0;
 pub const SIDE_SPEED_FACTOR: f32 = 1.;
-pub const GRAVITY: f32 = 3.;
+pub const GRAVITY: f32 = 10.;
 
 pub fn player_movement(
     keyboard_input: Res<Input<KeyCode>>,
@@ -52,12 +52,13 @@ pub fn update_distance_to_ground(
         let x = (player.pos.x - chunk.coordinate.x * CHUNK_SIDE_SIZE).floor() as usize;
         let y = (feet_position - chunk.coordinate.y * CHUNK_SIDE_SIZE).floor() as usize;
 
-        for y_iter in (0..y).rev() {
-            if chunk.blocks[x][y_iter] != AIR {
+        for y_iter in (y as i32)..(-(1 as i32)) {
+            if chunk.blocks[x][y_iter as usize] != AIR {
                 player.distance_to_ground = feet_position - y_iter as f32;
                 break
             }
         }
+        player.distance_to_ground = feet_position - 0. as f32;
     }
 }
 

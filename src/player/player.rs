@@ -100,7 +100,8 @@ impl Player {
     pub fn update(&mut self, dt: f32) {
         // TODO: fix slowing down
         self.vel += dt * self.acc;
-        if self.distance_to_ground < 0. && self.vel.y < 0.{
+
+        if self.distance_to_ground <= 0. && self.vel.y < 0.{
             self.vel.y = 0.;
         }
 
