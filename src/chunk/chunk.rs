@@ -26,6 +26,12 @@ pub struct Chunk {
     chunk_tile_map_builder: ChunkTileMapBuilder,
 }
 
+#[derive(Component)]
+pub struct ChunkCoordinate {
+    pub coordinate: Vec2,
+}
+
+
 impl Chunk {
     pub fn new(
         cord: Vec2,
@@ -62,7 +68,7 @@ impl Chunk {
         asset_server: &Res<AssetServer>,
         meshes: &mut ResMut<Assets<Mesh>>,
         materials: &mut ResMut<Assets<ColorMaterial>>,
-    ) -> Entity {
+    ) -> Mesh {
         for x in 0..CHUNK_SIZE {
             for y in 0..CHUNK_SIZE {
                 self.chunk_tile_map_builder.add_tile(
@@ -73,17 +79,7 @@ impl Chunk {
 
         let mesh = self.chunk_tile_map_builder.build();
 
-        let mesh_ent = commands.spawn(MaterialMesh2dBundle  {
-            mesh: meshes.add(mesh).into(),
-            material: materials.add(ColorMaterial::from(asset_server.load("tiles/tiles.png"))),
-            transform: Transform::from_xyz(
-                self.coordinate.x * CHUNK_SIDE_SIZE,
-                self.coordinate.y * CHUNK_SIDE_SIZE,
-                0.0),
-            ..Default::default()
-        }).id();
-
-        mesh_ent
+        mesh
     }
 }
 

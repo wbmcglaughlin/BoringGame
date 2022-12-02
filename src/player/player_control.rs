@@ -3,7 +3,7 @@ use bevy::{
 };
 use crate::{MainCamera, Player};
 
-pub const SPEED: f32 = 10.0;
+pub const SPEED: f32 = 100.0;
 pub const SIDE_SPEED_FACTOR: f32 = 1.;
 pub const GRAVITY: f32 = 3.;
 
