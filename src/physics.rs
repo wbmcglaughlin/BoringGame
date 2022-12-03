@@ -1,2 +1,2 @@
 pub(crate) mod collision;
-mod hitbox;
+pub mod hitbox;

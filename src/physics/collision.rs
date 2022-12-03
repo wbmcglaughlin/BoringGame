@@ -2,8 +2,8 @@ use bevy::{
     prelude::*,
 };
 use crate::chunk::chunk::{AIR, CHUNK_SIDE_SIZE, CHUNK_SIZE, TILE_SIZE};
-use crate::chunk::chunk_handler::ChunkHandler;
-use crate::physics::hitbox::HitBox;
+use crate::chunk::chunk_handler::{ChunkHandler, update_chunks};
+use crate::physics::hitbox::{HitBox, Direction};
 
 #[derive(Component)]
 pub struct CollisionDistances {
@@ -13,15 +13,26 @@ pub struct CollisionDistances {
 pub struct CollisionPlugin;
 impl Plugin for CollisionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system(check_hitbox_for_collision_with_chunk);
+        app.add_system(check_hitbox_for_collision_with_chunk.after(update_chunks));
     }
 }
 
 pub fn check_hitbox_for_collision_with_chunk(
-    mut hitboxes: Query<(&Transform, &mut CollisionDistances, &HitBox)>
+    mut hitboxes: Query<(&Transform, &mut CollisionDistances, &HitBox)>,
+    mut chunk_handler: ResMut<ChunkHandler>
 ) {
-    for (transform, collision_distances, hitbox) in hitboxes.iter_mut() {
+    for (transform, mut collision_distances, hitbox) in hitboxes.iter_mut() {
+        if !hitbox.collide_with_chunks {
+            continue;
+        }
         let position = transform.translation;
+        let position_xy = Vec2::new(position.x, position.y);
+        collision_distances.distances = [CHUNK_SIDE_SIZE; 4];
+        for offset in hitbox.get_offset_vectors() {
+            let raycast = chunk_raycast(position_xy + offset, &mut chunk_handler);
+            collision_distances.distances[Direction::D as usize]
+                = collision_distances.distances[Direction::D as usize].min(raycast);
+        }
     }
 }
 

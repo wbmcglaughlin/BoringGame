@@ -1,3 +1,5 @@
+#![feature(arbitrary_enum_discriminant)]
+
 mod chunk;
 mod player;
 mod physics;
@@ -9,6 +11,7 @@ use bevy::window::PresentMode;
 use bevy_debug_text_overlay::OverlayPlugin;
 use crate::chunk::chunk::Chunk;
 use crate::chunk::chunk_handler::ChunkHandlerPlugin;
+use crate::physics::collision::CollisionPlugin;
 use crate::player::player::{Player, PlayerPlugin};
 
 fn main() {
@@ -27,6 +30,7 @@ fn main() {
         .add_startup_system(setup)
         .add_plugin(ChunkHandlerPlugin)
         .add_plugin(PlayerPlugin)
+        .add_plugin(CollisionPlugin)
         .run();
 }
 

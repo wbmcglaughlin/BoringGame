@@ -1,9 +1,12 @@
 use bevy::{
     prelude::*,
 };
+use crate::chunk::chunk::CHUNK_SIDE_SIZE;
 use crate::chunk::chunk_handler::update_chunks;
+use crate::physics::collision::CollisionDistances;
 use crate::player::boring::bore;
 use crate::player::player_control::{player_movement, update_camera, update_distance_to_ground};
+use crate::physics::hitbox::{HitBox, Direction};
 
 #[derive(Component, Deref, DerefMut)]
 struct PlayerAnimationTimer(Timer);
@@ -78,6 +81,13 @@ pub fn spawn_player(
             distance_moved: 0.0,
             distance_to_ground: 1.0
         },
+        HitBox {
+          offsets: [0.5, 0.5, 0.24, 0.24],
+            collide_with_chunks: true,
+        },
+        CollisionDistances {
+            distances: [CHUNK_SIDE_SIZE, CHUNK_SIDE_SIZE, CHUNK_SIDE_SIZE, CHUNK_SIDE_SIZE]
+        },
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             transform: Transform::from_translation(
@@ -100,11 +110,11 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn update(&mut self, dt: f32) {
+    pub fn update(&mut self, dt: f32, distances: [f32; 4]) {
         // TODO: fix slowing down
         self.vel += dt * self.acc;
 
-        if self.distance_to_ground <= 0. && self.vel.y < 0.{
+        if distances[Direction::D as usize] <= 0. && self.vel.y < 0.{
             self.vel.y = 0.;
             self.pos.y = (self.pos.y + 0.5).round() - 0.5;
         }
