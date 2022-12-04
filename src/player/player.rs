@@ -112,11 +112,9 @@ impl Player {
         // TODO: fix slowing down
         self.vel += dt * self.acc;
 
-        if distances[Direction::D as usize] <= 0. && self.vel.y < 0.{
+        if distances[Direction::D as usize] <= 0.5 && self.vel.y < 0.{
             self.vel.y = 0.;
-            // self.pos.y = (self.pos.y + 0.5).round() - 0.5;
         }
-
         self.pos += dt * self.vel;
 
         self.distance_moved += (dt * self.vel).length();

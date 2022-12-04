@@ -45,13 +45,13 @@ pub fn chunk_raycast(
     chunk_handler: &mut ResMut<ChunkHandler>,
     direction: Direction
 ) -> f32 {
-    let ray_distance = TILE_SIZE / 2.0;
+    let ray_distance = TILE_SIZE / 4.0;
 
     // Get chunk that point is in and retrieve chunk.
     let (chunk, x, y) = chunk_handler.get_chunk_xy(point);
 
-    let mut x_middle = x as f32 + 0.5;
-    let mut y_middle = y as f32 + 0.5;
+    let mut x_chunk_pos = point.x - chunk.coordinate.x * CHUNK_SIDE_SIZE;
+    let mut y_chunk_pos = point.y - chunk.coordinate.y * CHUNK_SIDE_SIZE;
 
     // Match direction to step direction
     let step: (i32, i32) = match direction {
@@ -66,35 +66,33 @@ pub fn chunk_raycast(
     let mut y_step = 0 as f32;
 
     while
-        x_step + x_middle >= 0.0 && x_step + x_middle < CHUNK_SIZE as f32 &&
-        y_step + y_middle >= 0.0 && y_step + y_middle < CHUNK_SIZE as f32
+        x_step + x_chunk_pos >= 0.0 && x_step + x_chunk_pos <= CHUNK_SIZE as f32 &&
+        y_step + y_chunk_pos >= 0.0 && y_step + y_chunk_pos <= CHUNK_SIZE as f32
     {
-        if chunk.blocks[(x_step + x_middle as f32) as usize][(y_step + y_middle as f32) as usize] != AIR {
-            return if x_step.abs() > y_step.abs() {
-                x_step.abs()
-            } else {
-                y_step.abs()
-            }
+        if chunk.blocks[(x_step + x_chunk_pos) as usize][(y_step + y_chunk_pos) as usize] != AIR {
+            return raycast_result(x_step, y_step, &direction)
         }
+
         x_step += step.0 as f32 * ray_distance;
         y_step += step.1 as f32 * ray_distance;
     }
 
-    let (chunk, x, y) = chunk_handler.get_chunk_xy(Vec2::new(point.x + x_middle as f32, y_step + y_middle as f32));
-    x_middle = x as f32 + 0.5;
-    y_middle = y as f32 + 0.5;
+    let (chunk, x, y) = chunk_handler.get_chunk_xy(Vec2::new(point.x + x_chunk_pos, y_step + y_chunk_pos));
+    x_chunk_pos = point.x + x_step - chunk.coordinate.x * CHUNK_SIDE_SIZE;
+    y_chunk_pos = point.y + y_step - chunk.coordinate.y * CHUNK_SIDE_SIZE;
 
-    return if chunk.blocks[(x_step + x_middle as f32) as usize][(y_step + y_middle as f32) as usize] != AIR {
-        if x_step.abs() > y_step.abs() {
-            x_step.abs().floor()
-        } else {
-            y_step.abs().floor()
-        }
+    return if chunk.blocks[(x_chunk_pos) as usize][(y_chunk_pos) as usize] != AIR {
+        raycast_result(x_step, y_step, &direction)
     } else {
-        if x_step.abs() > y_step.abs() {
-            x_step.abs().floor() + ray_distance
-        } else {
-            y_step.abs().floor() + ray_distance
-        }
+        raycast_result(x_step + step.0 as f32 * TILE_SIZE as f32, y_step + step.1 as f32 * TILE_SIZE as f32, &direction)
     };
+}
+
+fn raycast_result(x_step: f32, y_step: f32, dir: &Direction) -> f32 {
+    return match dir {
+        Direction::U => {y_step}
+        Direction::D => {y_step.abs()}
+        Direction::L => {x_step.abs()}
+        Direction::R => {x_step}
+    }
 }
