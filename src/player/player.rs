@@ -108,15 +108,21 @@ pub struct Player {
 
 impl Player {
     pub fn update(&mut self, dt: f32, distances: [f32; 4]) {
-        screen_print!("{:?}", distances);
-        // TODO: fix slowing down
         self.vel += dt * self.acc;
 
-        if distances[Direction::D as usize] <= 0.1 && self.vel.y < 0.{
+        if distances[Direction::D as usize] <= 0.0 && self.vel.y * dt <= 0.0 && self.acc.y * dt <= 0.0 {
             self.vel.y = 0.;
         }
-        self.pos += dt * self.vel;
 
+        let mut distance = self.vel * dt;
+        if -distances[Direction::D as usize] > distance.y && distance.y < 0.0 {
+            distance.y = -distances[Direction::D as usize];
+        }
+        self.pos += distance;
+
+        if distances[Direction::D as usize] <= 0.0 && self.vel.y * dt <= 0.0 && self.acc.y * dt <= 0.0 {
+            self.pos.y = (self.pos.y + 0.5).round() - 0.5;
+        }
 
         self.distance_moved += (dt * self.vel).length();
 

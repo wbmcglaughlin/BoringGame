@@ -1,4 +1,3 @@
-use std::ops::Range;
 use bevy::{
     prelude::*,
 };
@@ -93,13 +92,13 @@ pub fn chunk_raycast(
     }
 
     let (chunk, x, y) = chunk_handler.get_chunk_xy(Vec2::new(point.x + x_chunk_pos, y_step + y_chunk_pos));
-    x_chunk_pos = point.x + x_step - chunk.coordinate.x * CHUNK_SIDE_SIZE;
-    y_chunk_pos = point.y + y_step - chunk.coordinate.y * CHUNK_SIDE_SIZE;
+    x_chunk_pos = point.x + x_step - chunk.coordinate.x * CHUNK_SIDE_SIZE + step.0 as f32 * ray_distance;
+    y_chunk_pos = point.y + y_step - chunk.coordinate.y * CHUNK_SIDE_SIZE + step.1 as f32 * ray_distance;
 
     return if chunk.blocks[(x_chunk_pos) as usize][(y_chunk_pos) as usize] != AIR {
         raycast_result(x_step, y_step, &direction)
     } else {
-        raycast_result(x_step + step.0 as f32 * TILE_SIZE as f32, y_step + step.1 as f32 * TILE_SIZE as f32, &direction)
+        raycast_result(x_step + TILE_SIZE as f32, y_step + TILE_SIZE as f32, &direction)
     };
 }
 
