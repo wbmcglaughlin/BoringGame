@@ -36,6 +36,21 @@ pub fn check_hitbox_for_collision_with_chunk(
                 collision_distances.distances[Direction::D as usize]
                     = collision_distances.distances[Direction::D as usize].min(raycast);
             }
+            if offset.y > 0.0 {
+                let raycast = chunk_raycast(position_xy + offset, &mut chunk_handler, Direction::U);
+                collision_distances.distances[Direction::U as usize]
+                    = collision_distances.distances[Direction::U as usize].min(raycast);
+            }
+            if offset.x < 0.0 {
+                let raycast = chunk_raycast(position_xy + offset, &mut chunk_handler, Direction::L);
+                collision_distances.distances[Direction::L as usize]
+                    = collision_distances.distances[Direction::L as usize].min(raycast);
+            }
+            if offset.x > 0.0 {
+                let raycast = chunk_raycast(position_xy + offset, &mut chunk_handler, Direction::U);
+                collision_distances.distances[Direction::R as usize]
+                    = collision_distances.distances[Direction::R as usize].min(raycast);
+            }
         }
     }
 }
@@ -45,7 +60,7 @@ pub fn chunk_raycast(
     chunk_handler: &mut ResMut<ChunkHandler>,
     direction: Direction
 ) -> f32 {
-    let ray_distance = TILE_SIZE / 4.0;
+    let ray_distance = TILE_SIZE / 8.0;
 
     // Get chunk that point is in and retrieve chunk.
     let (chunk, x, y) = chunk_handler.get_chunk_xy(point);
@@ -66,8 +81,8 @@ pub fn chunk_raycast(
     let mut y_step = 0 as f32;
 
     while
-        x_step + x_chunk_pos >= 0.0 && x_step + x_chunk_pos <= CHUNK_SIZE as f32 &&
-        y_step + y_chunk_pos >= 0.0 && y_step + y_chunk_pos <= CHUNK_SIZE as f32
+        x_step + x_chunk_pos >= 0.0 && x_step + x_chunk_pos < CHUNK_SIZE as f32 &&
+        y_step + y_chunk_pos >= 0.0 && y_step + y_chunk_pos < CHUNK_SIZE as f32
     {
         if chunk.blocks[(x_step + x_chunk_pos) as usize][(y_step + y_chunk_pos) as usize] != AIR {
             return raycast_result(x_step, y_step, &direction)
