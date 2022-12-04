@@ -24,6 +24,7 @@ impl HitBox {
 }
 
 #[repr(usize)]
+#[derive(PartialEq)]
 pub enum Direction {
     U = 0,
     D,

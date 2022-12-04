@@ -1,11 +1,11 @@
 use bevy::{
     prelude::*,
 };
+use bevy_debug_text_overlay::screen_print;
 use crate::chunk::chunk::CHUNK_SIDE_SIZE;
-use crate::chunk::chunk_handler::update_chunks;
 use crate::physics::collision::CollisionDistances;
 use crate::player::boring::bore;
-use crate::player::player_control::{player_movement, update_camera, update_distance_to_ground};
+use crate::player::player_control::{GRAVITY, player_movement, update_camera};
 use crate::physics::hitbox::{HitBox, Direction};
 
 #[derive(Component, Deref, DerefMut)]
@@ -16,7 +16,6 @@ impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_startup_system(spawn_player)
-            .add_system(update_distance_to_ground.after(update_chunks))
             .add_system(bore)
             .add_system(player_movement)
             .add_system(update_camera)
@@ -71,7 +70,7 @@ pub fn spawn_player(
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     // Set player position
-    let player_position = Vec2::new(0.0, 0.5);
+    let player_position = Vec2::new(0.0, 2.0);
 
     let player_entity = commands.spawn((
         Player {
@@ -79,7 +78,6 @@ pub fn spawn_player(
             vel: Vec2::default(),
             acc: Vec2::default(),
             distance_moved: 0.0,
-            distance_to_ground: 1.0
         },
         HitBox {
           offsets: [0.5, 0.5, 0.24, 0.24],
@@ -106,17 +104,17 @@ pub struct Player {
     pub(crate) acc: Vec2,
 
     pub distance_moved: f32,
-    pub distance_to_ground: f32
 }
 
 impl Player {
     pub fn update(&mut self, dt: f32, distances: [f32; 4]) {
+        screen_print!("{:?}", distances);
         // TODO: fix slowing down
         self.vel += dt * self.acc;
 
         if distances[Direction::D as usize] <= 0. && self.vel.y < 0.{
             self.vel.y = 0.;
-            self.pos.y = (self.pos.y + 0.5).round() - 0.5;
+            // self.pos.y = (self.pos.y + 0.5).round() - 0.5;
         }
 
         self.pos += dt * self.vel;
@@ -132,11 +130,11 @@ impl Player {
         self.acc = Vec2::default();
     }
 
-    pub fn add_acc(&mut self, mut acc: Vec2) {
+    pub fn add_acc(&mut self, acc: Vec2, distances: [f32; 4]) {
         let mut accel = acc.clone();
-        if self.distance_to_ground > 0.0 {
-            accel.x = 0.
+        if distances[Direction::D as usize] > 0.0 {
+            accel.y = -GRAVITY;
         }
-        self.acc += acc;
+        self.acc += accel;
     }
 }
